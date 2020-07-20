@@ -2,8 +2,8 @@ import http.server
 import ssl
 import os
 
-HOST = 'localhost'
-PORT = 4443
+HOST = '0.0.0.0'
+PORT = 8070
 
 server_address = (HOST, PORT)
 

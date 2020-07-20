@@ -43,6 +43,6 @@ def index():
     return 'Firmware OTA Server'
 
 if __name__ == '__main__':
-    http_server = WSGIServer(('', 5000), app,
+    http_server = WSGIServer(('', 8070), app,
         keyfile='ca_key.pem', certfile='ca_cert.pem')
     http_server.serve_forever()
