@@ -1,0 +1,42 @@
+version: '3.7'
+
+services:
+  ota-server:
+    build: .
+    container_name: ota-server
+    networks:
+      - default
+      - traefik-public
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      labels:
+        traefik.enable: 'true'
+
+        # network setup
+        traefik.docker.network: 'traefik-public'
+        traefik.http.services.ota-server-service.loadbalancer.server.port: '5000'
+
+        # http redirect
+        traefik.http.routers.ota-server-http-router.entrypoints: 'http'
+        traefik.http.routers.ota-server-http-router.rule: 'Host(`ota.lildata.monster`)'
+        traefik.http.routers.ota-server-http-router.middlewares: 'ota-server-redirect'
+        traefik.http.middlewares.ota-server-redirect.redirectscheme.scheme: 'https'
+
+        # https
+        traefik.http.routers.ota-server-https-router.entrypoints: 'https'
+        traefik.http.routers.ota-server-https-router.rule: 'Host(`ota.lildata.monster`)'
+        traefik.http.routers.ota-server-https-router.tls: 'true'
+        #traefik.http.routers.ota-server-https-router.tls.certresolver: 'letsencrypt_resolver'
+        traefik.http.routers.ota-server-https-router.tls.certificates.certFile: './ca_cert.pem'
+        traefik.http.routers.ota-server-https-router.tls.certificates.certKey: './ca_ket.pem'
+
+        # authentication
+        #traefik.http.routers.ota-server-https-router.middlewares: 'telegraf-auth'
+        #traefik.http.middlewares.ota-server-auth.basicauth.users: 'ldm:$$apr1$$2lYIhk0A$$rN7iapC3frLW3vIdEpnCf1'
+  
+networks:
+  default:
+  traefik-public:
+    external: true
